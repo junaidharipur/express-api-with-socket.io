@@ -1,5 +1,9 @@
 interface IStandardError {
   message: string;
+  errors?: {
+    reason: string;
+    field?: string;
+  }[];
 }
 
 export abstract class AppError extends Error {
