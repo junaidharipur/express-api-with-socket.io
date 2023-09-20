@@ -23,4 +23,17 @@ export class AuthRouteHandler {
       next(err);
     }
   }
+
+  static async updateUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await new AuthManager().updateUser(
+        (req as any).user._id,
+        req.body
+      );
+
+      res.status(200).json(data);
+    } catch (err) {
+      next(err);
+    }
+  }
 }

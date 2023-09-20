@@ -12,5 +12,15 @@ const SignUpValidator = [
   body("password").isString().trim(),
 ];
 
+const UserUpdateValidator = [
+  body("name").isString().optional(),
+  body("email").trim().isEmail().optional(),
+  body("password").isString().trim().optional(),
+];
+
 export const LoginValidationCheck = [...LoginValidator, ValidationCheck];
 export const SignUpValidatorCheck = [...SignUpValidator, ValidationCheck];
+export const UserUpdateValidatorCheck = [
+  ...UserUpdateValidator,
+  ValidationCheck,
+];

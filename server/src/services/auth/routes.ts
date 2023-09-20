@@ -1,14 +1,20 @@
 import express from "express";
 import { AuthRouteHandler } from "./controller";
-import { LoginValidationCheck, SignUpValidatorCheck } from "./validators";
+import { AuthCheck } from "../../middlewares/AuthCheck";
+import {
+  LoginValidationCheck,
+  SignUpValidatorCheck,
+  UserUpdateValidatorCheck,
+} from "./validators";
 
 const router = express.Router();
 
-router.post("/login", LoginValidationCheck, AuthRouteHandler.loginUser);
-router.post(
-  "/account",
-  SignUpValidatorCheck,
-  AuthRouteHandler.createNewAccount
-);
+router.route("/login").post(LoginValidationCheck, AuthRouteHandler.loginUser);
+router
+  .route("/account")
+  .post(SignUpValidatorCheck, AuthRouteHandler.createNewAccount);
+router
+  .route("/user")
+  .post(AuthCheck, UserUpdateValidatorCheck, AuthRouteHandler.updateUser);
 
 export { router as authRouter };

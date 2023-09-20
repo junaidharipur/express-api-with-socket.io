@@ -6,7 +6,10 @@ import { JsonWebToken } from "../../utils/JWTWebToken";
 import { PasswordManager } from "../../utils/Password";
 import { UserDoc } from "../../models/db/User/User";
 import { UserLoginData } from "../../models/appTypes/Auth";
+import { EventBus } from "../../IO/EventBus/EventSystem";
+import { Types } from "mongoose";
 
+type TUserUpdate = Partial<UserAttr> & { _id: string };
 export class AuthManager extends AppManager {
   private getUserAuthData = (user: UserDoc): UserLoginData => {
     const tokenData = { userId: user._id };
@@ -25,7 +28,7 @@ export class AuthManager extends AppManager {
     if (!email || !password)
       throw new BadRequestError("Email or Password is Missing!");
 
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email }).select("+password +_id");
     if (user) {
       const isValid = await PasswordManager.comparePassword(
         password,
@@ -54,4 +57,35 @@ export class AuthManager extends AppManager {
 
     return this.getUserAuthData(newUser);
   }
+
+  async updateUser(userId: Types.ObjectId, user: TUserUpdate) {
+    const fetchedUser = await User.findOne({ _id: userId });
+    if (!fetchedUser) {
+      throw new BadRequestError(`User with id: "${user._id}" couldn't found!`);
+    }
+
+    if (!user || typeof user !== "object") {
+      throw new BadRequestError(`Invalid data provided!`);
+    }
+
+    const updateUser = await User.updateOne(
+      { _id: fetchedUser._id },
+      user
+    ).getUpdate();
+
+    if (this.isSystemBusEnabled) {
+      EventBus.emit("USER_UPDATED", updateUser as UserDoc, userId);
+    }
+
+    return { message: "success" };
+  }
+
+  verifyUserToken = async (token: string) => {
+    const userData = JsonWebToken.decodeToken(token);
+    if (userData) {
+      const user = await User.findOne({ _id: userData.userId });
+      if (user) return user;
+    }
+    throw new BadRequestError("Invalid Token!");
+  };
 }
