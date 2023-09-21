@@ -2,7 +2,20 @@ import { TLoginData, TUserUpdateData } from "../models/Auth/Auth";
 import { QueryResultCallback } from "../models/Callback/Callback";
 import { APIManager } from "./APIManager";
 
+type TAuthConfig = {
+  postLoginFn: () => void;
+  postLogoutFn: () => void;
+};
+
 export class AuthManager {
+  private postLoginFn: () => void;
+  private postLogoutFn: () => void;
+
+  constructor(config: TAuthConfig) {
+    this.postLoginFn = config.postLoginFn;
+    this.postLogoutFn = config.postLogoutFn;
+  }
+
   async loginUser(
     email: string,
     password: string,
@@ -16,6 +29,8 @@ export class AuthManager {
     if (result.status !== "error" && result.data) {
       localStorage.setItem("token", result?.data.access_token!);
       localStorage.setItem("user", JSON.stringify(result?.data.userData!));
+
+      this.postLoginFn();
 
       return cb(null, result.data);
     } else {
@@ -61,16 +76,8 @@ export class AuthManager {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
+    this.postLogoutFn();
+
     cb(null);
-  }
-
-  getUser(cb: QueryResultCallback<TLoginData>) {
-    const user = localStorage.getItem("user");
-
-    if (typeof user === "string" && user.length > 5) {
-      cb(null, JSON.parse(user));
-    }
-
-    cb("Error Getting User!");
   }
 }

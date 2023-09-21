@@ -9,7 +9,7 @@ import { UserLoginData } from "../../models/appTypes/Auth";
 import { EventBus } from "../../IO/EventBus/EventSystem";
 import { Types } from "mongoose";
 
-type TUserUpdate = Partial<UserAttr> & { _id: string };
+type TUserUpdate = { name: string };
 export class AuthManager extends AppManager {
   private getUserAuthData = (user: UserDoc): UserLoginData => {
     const tokenData = { userId: user._id };
@@ -61,7 +61,7 @@ export class AuthManager extends AppManager {
   async updateUser(userId: Types.ObjectId, user: TUserUpdate) {
     const fetchedUser = await User.findOne({ _id: userId });
     if (!fetchedUser) {
-      throw new BadRequestError(`User with id: "${user._id}" couldn't found!`);
+      throw new BadRequestError(`User with id: "${userId}" couldn't found!`);
     }
 
     if (
@@ -74,11 +74,13 @@ export class AuthManager extends AppManager {
 
     const updateUser = await User.updateOne(
       { _id: fetchedUser._id },
-      user
-    ).getUpdate();
+      { name: user.name }
+    );
+
+    console.log(updateUser);
 
     if (this.isSystemBusEnabled) {
-      EventBus.emit("USER_UPDATED", updateUser as UserDoc, userId);
+      EventBus.emit("USER_UPDATED", { name: user.name } as UserDoc, userId);
     }
 
     return { message: "success" };

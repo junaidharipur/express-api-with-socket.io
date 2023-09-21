@@ -16,8 +16,6 @@ export function HomePage() {
       if (errMsg) {
         AppManager.alert.error("Update Failed", errMsg);
       }
-
-      console.log(data);
     });
   };
 

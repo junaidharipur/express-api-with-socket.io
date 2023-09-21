@@ -9,6 +9,7 @@ import {
 } from "../../constants/appRoutes";
 import { AppManager } from "../../manager";
 import { TLoginData } from "../../models/Auth/Auth";
+import { CUSTOM_USER_CHANGE_EVENT } from "../../constants/customDomEvents";
 
 const { Header, Content } = AntLayout;
 
@@ -21,11 +22,19 @@ export function Layout(props: LayoutProps) {
   const [user, setUser] = React.useState<TLoginData | undefined>(undefined);
 
   React.useEffect(() => {
-    AppManager.auth.getUser((err, user) => {
-      if (!err) {
-        setUser(user);
-      }
-    });
+    const getUserCallback = (_e: any) => {
+      AppManager.user.getUser((err, user) => {
+        if (!err) {
+          setUser(user);
+        }
+      });
+    };
+    getUserCallback(null);
+
+    document.addEventListener(CUSTOM_USER_CHANGE_EVENT, getUserCallback);
+
+    return () =>
+      document.removeEventListener(CUSTOM_USER_CHANGE_EVENT, getUserCallback);
   }, []);
 
   const handleLogout = () => {

@@ -12,6 +12,14 @@ export function RequiresAuth(Component: React.FunctionComponent) {
         AppManager.route.goToLogin();
       }
 
+      if (!AppManager.realtime.isInitialized) {
+        AppManager.realtime.init({
+          onDataReceived(evt, data) {
+            AppManager.sync.networkDataReceived(evt, data);
+          },
+        });
+      }
+
       setIsAuthenticated(true);
     }, []);
 
