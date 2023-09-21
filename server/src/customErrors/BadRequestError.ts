@@ -1,7 +1,7 @@
 import { AppError } from "./AppError";
 
 export class BadRequestError extends AppError {
-  public statusCode = 404;
+  public statusCode = 400;
   public message: string;
 
   constructor(message: string) {

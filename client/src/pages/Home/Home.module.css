@@ -1,0 +1,16 @@
+.container {
+    width: 400px;
+    margin: 10vh auto;
+    text-align: center;
+}
+
+
+.form {
+    margin-top: 20px;
+    padding-bottom: 40px;
+}
+
+.button,
+.input {
+    width: 100%;
+}

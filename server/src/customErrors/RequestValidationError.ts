@@ -15,7 +15,7 @@ export class RequestValidationError extends AppError {
 
   serializeError() {
     return {
-      message: "Validation Errors",
+      message: "Validation Error!",
       errors: this.errors.map((err) => {
         if (err.type === "field") {
           return { reason: err.msg, field: err.path };

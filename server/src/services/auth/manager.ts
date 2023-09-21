@@ -64,7 +64,11 @@ export class AuthManager extends AppManager {
       throw new BadRequestError(`User with id: "${user._id}" couldn't found!`);
     }
 
-    if (!user || typeof user !== "object") {
+    if (
+      !user ||
+      typeof user !== "object" ||
+      (user.name && user.name?.length < 1)
+    ) {
       throw new BadRequestError(`Invalid data provided!`);
     }
 

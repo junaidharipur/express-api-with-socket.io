@@ -14,7 +14,7 @@ router
   .route("/account")
   .post(SignUpValidatorCheck, AuthRouteHandler.createNewAccount);
 router
-  .route("/user")
+  .route("/profile")
   .post(AuthCheck, UserUpdateValidatorCheck, AuthRouteHandler.updateUser);
 
 export { router as authRouter };
